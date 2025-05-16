@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Boyner Spor Ayakkabı Listesi</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .product-card {
+        height: 100%;
+        transition: transform 0.2s;
+      }
+      .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      }
+      .product-image {
+        height: 200px;
+        object-fit: contain;
+      }
+      .badge-container {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1;
+      }
+      .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+      .barcode {
+        font-family: monospace;
+        background-color: #f8f9fa;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-size: 0.8em;
+        color: #6c757d;
+      }
+      .badge-item {
+        display: inline-block;
+        margin-right: 5px;
+        margin-bottom: 5px;
+        padding: 3px 8px;
+        border-radius: 3px;
+        background-color: #e9ecef;
+        font-size: 0.8em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading" id="loadingIndicator">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Yükleniyor...</span>
+      </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="#">Boyner Spor Ayakkabı Listesi</a>
+      </div>
+    </nav>
+
+    <div class="container my-4">
+      <div class="row mb-4" id="badgeFiltersContainer" style="display: none">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Rozet Filtreleri</h5>
+              <div id="badgeFilters"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <div class="col-md-8 mx-auto">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Ürün Listeleme Seçenekleri</h5>
+              <div class="row">
+                <div class="col-md-6 mb-3 mb-md-0">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <h6 class="card-subtitle mb-2 text-muted">
+                        Belirli Bir Sayfa
+                      </h6>
+                      <div class="input-group mb-2">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="pageInput"
+                          placeholder="Sayfa numarası"
+                          min="1"
+                          value="1"
+                        />
+                        <button
+                          class="btn btn-primary"
+                          type="button"
+                          id="fetchButton"
+                        >
+                          Sayfayı Getir
+                        </button>
+                      </div>
+                      <div class="form-text">
+                        Görüntülemek istediğiniz sayfa numarasını girin.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <h6 class="card-subtitle mb-2 text-muted">
+                        Gelişmiş Listeleme
+                      </h6>
+                      <div class="mb-3">
+                        <label for="pageRangeStart" class="form-label"
+                          >Başlangıç Sayfası:</label
+                        >
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="pageRangeStart"
+                          value="1"
+                          min="1"
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <label for="pageRangeEnd" class="form-label"
+                          >Bitiş Sayfası:</label
+                        >
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="pageRangeEnd"
+                          value="5"
+                          min="1"
+                        />
+                      </div>
+                      <div class="mb-3">
+                        <div class="form-check">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="parallelFetch"
+                            checked
+                          />
+                          <label class="form-check-label" for="parallelFetch">
+                            Paralel Yükleme (Daha Hızlı)
+                          </label>
+                        </div>
+                      </div>
+                      <button
+                        class="btn btn-success w-100"
+                        type="button"
+                        id="fetchRangeButton"
+                      >
+                        Seçili Sayfaları Getir
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="statusContainer" class="mb-4" style="display: none">
+        <div class="progress">
+          <div
+            id="progressBar"
+            class="progress-bar progress-bar-striped progress-bar-animated"
+            role="progressbar"
+            style="width: 0%"
+          ></div>
+        </div>
+        <div id="statusText" class="text-center mt-2">Yükleniyor...</div>
+      </div>
+      <div class="row g-4" id="productContainer"></div>
+      <div
+        id="loadMoreContainer"
+        class="text-center my-4"
+        style="display: none"
+      >
+        <button id="loadMoreButton" class="btn btn-outline-primary">
+          Daha Fazla Ürün Yükle
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Global state to store loaded products and pagination info
+      const state = {
+        loadedProducts: [],
+        currentPage: 1,
+        totalPages: 0,
+        totalProducts: 0,
+        pageSize: 24,
+        isLoading: false,
+        hasMorePages: true,
+        displayedProducts: 0,
+        selectedBadges: [],
+        allBadges: [],
+      };
+
+      async function fetchProducts(page = 1) {
+        try {
+          // API URL'ini Netlify fonksiyonuna yönlendir
+          const url = `/api/boyner-api?Page=${page}&DropListingPageSize=${state.pageSize}`;
+          console.log(`Fetching products from Netlify function: ${url}`);
+
+          const response = await fetch(url);
+
+          // Check if the response is OK (status in the range 200-299)
+          if (!response.ok) {
+            console.error(
+              `API error: ${response.status} ${response.statusText}`
+            );
+            return {
+              error: true,
+              message: `API error: ${response.status} ${response.statusText}`,
+            };
+          }
+
+          // Try to parse the JSON response
+          try {
+            const data = await response.json();
+            console.log(`Page ${page} data received:`, data);
+
+            // Check if the API returned a success response
+            if (!data.Success) {
+              console.error("API returned error:", data.Message);
+              return {
+                error: true,
+                message: data.Message || "API returned an error",
+              };
+            }
+
+            // Extract only the required information from each product
+            const simplifiedProducts = data.Result.ProductList.map(
+              (product) => ({
+                barcode: product.Barcode,
+                badges: product.Badges || [],
+                brandName: product.BrandName,
+                displayName: product.DisplayName,
+                image: product.FirstProductImageUrl,
+                campaignPrice: product.CampaignPrice,
+                actualPriceFormatted: product.ActualPriceToShowOnScreenFormatted,
+                strikeThroughPrice: product.StrikeThroughPriceToShowOnScreenFormatted,
+                campaignPriceFormatted: product.CampaignPriceFormatted,
+              })
+            );
+
+            return {
+              error: false,
+              products: simplifiedProducts,
+              page: page,
+              totalCount: data.Result.TotalCount || simplifiedProducts.length,
+              totalPages: Math.ceil(
+                (data.Result.TotalCount || simplifiedProducts.length) /
+                  state.pageSize
+              ),
+            };
+          } catch (jsonError) {
+            console.error("JSON parsing error:", jsonError);
+            return {
+              error: true,
+              message: "API response could not be parsed as JSON",
+            };
+          }
+        } catch (networkError) {
+          console.error("Network error:", networkError);
+          return {
+            error: true,
+            message: "Network error: Could not connect to the API",
+          };
+        }
+      }
+
+      // Fetch a single page and render it
+      async function fetchSinglePage() {
+        showLoading();
+        const pageInput = document.getElementById("pageInput");
+        const page = parseInt(pageInput.value) || 1;
+
+        if (page < 1) {
+          alert("Lütfen geçerli bir sayfa numarası girin (en az 1)");
+          pageInput.value = 1;
+          hideLoading();
+          return;
+        }
+
+        // Reset state
+        state.loadedProducts = [];
+        state.currentPage = page;
+        state.displayedProducts = 0;
+
+        const data = await fetchProducts(page);
+        hideLoading();
+
+        if (!data.error) {
+          state.totalPages = data.totalPages;
+          state.totalProducts = data.totalCount;
+          state.loadedProducts = data.products;
+        }
+
+        renderProducts(data, true); // true = clear container first
+      }
+
+      // Fetch a range of pages with progress tracking
+      async function fetchPageRange() {
+        const startPage =
+          parseInt(document.getElementById("pageRangeStart").value) || 1;
+        const endPage =
+          parseInt(document.getElementById("pageRangeEnd").value) || 5;
+        const useParallel = document.getElementById("parallelFetch").checked;
+
+        if (startPage < 1 || endPage < startPage) {
+          alert("Lütfen geçerli bir sayfa aralığı girin");
+          return;
+        }
+
+        // Reset state
+        state.loadedProducts = [];
+        state.currentPage = startPage;
+        state.displayedProducts = 0;
+        state.isLoading = true;
+
+        // Show status container and reset progress
+        const statusContainer = document.getElementById("statusContainer");
+        const progressBar = document.getElementById("progressBar");
+        const statusText = document.getElementById("statusText");
+        statusContainer.style.display = "block";
+        progressBar.style.width = "0%";
+        statusText.textContent = "Hazırlanıyor...";
+
+        // Clear product container
+        const container = document.getElementById("productContainer");
+        container.innerHTML = "";
+
+        try {
+          // First fetch page 1 to get total count
+          showLoading();
+          const firstPageData = await fetchProducts(startPage);
+          hideLoading();
+
+          if (firstPageData.error) {
+            statusText.textContent = `Hata: ${firstPageData.message}`;
+            progressBar.classList.add("bg-danger");
+            return;
+          }
+
+          // Update state with first page data
+          state.totalPages = firstPageData.totalPages;
+          state.totalProducts = firstPageData.totalCount;
+          state.loadedProducts = [...firstPageData.products];
+
+          // Render first page products
+          renderProducts(
+            {
+              error: false,
+              products: firstPageData.products,
+              page: startPage,
+              totalCount: firstPageData.totalCount,
+              totalPages: firstPageData.totalPages,
+            },
+            true
+          );
+
+          // Update progress
+          const totalPagesToFetch = endPage - startPage + 1;
+          const progress = (1 / totalPagesToFetch) * 100;
+          progressBar.style.width = `${progress}%`;
+          statusText.textContent = `Sayfa ${startPage}/${endPage} yüklendi (${state.loadedProducts.length}/${state.totalProducts} ürün)`;
+
+          // Fetch remaining pages
+          if (startPage < endPage) {
+            if (useParallel) {
+              // Parallel fetching (faster but more resource intensive)
+              const pagePromises = [];
+              for (let page = startPage + 1; page <= endPage; page++) {
+                pagePromises.push(fetchProducts(page));
+              }
+
+              // Show loading for parallel requests
+              showLoading();
+
+              // Process results as they come in
+              const results = await Promise.allSettled(pagePromises);
+              hideLoading();
+
+              let successCount = 1; // Start at 1 because we already loaded the first page
+
+              results.forEach((result, index) => {
+                const currentPage = startPage + 1 + index;
+
+                if (result.status === "fulfilled" && !result.value.error) {
+                  // Add products from this page
+                  state.loadedProducts = [
+                    ...state.loadedProducts,
+                    ...result.value.products,
+                  ];
+                  successCount++;
+
+                  // Render the new products
+                  renderAdditionalProducts(result.value.products);
+                } else {
+                  console.error(
+                    `Error fetching page ${currentPage}:`,
+                    result.status === "rejected"
+                      ? result.reason
+                      : result.value.message
+                  );
+                }
+
+                // Update progress after each page is processed
+                const newProgress = (successCount / totalPagesToFetch) * 100;
+                progressBar.style.width = `${newProgress}%`;
+                statusText.textContent = `Sayfa ${successCount}/${totalPagesToFetch} yüklendi (${state.loadedProducts.length}/${state.totalProducts} ürün)`;
+              });
+            } else {
+              // Sequential fetching (slower but more reliable)
+              for (let page = startPage + 1; page <= endPage; page++) {
+                showLoading();
+                const pageData = await fetchProducts(page);
+                hideLoading();
+
+                if (!pageData.error) {
+                  // Add products from this page
+                  state.loadedProducts = [
+                    ...state.loadedProducts,
+                    ...pageData.products,
+                  ];
+
+                  // Render the new products
+                  renderAdditionalProducts(pageData.products);
+                } else {
+                  console.error(
+                    `Error fetching page ${page}:`,
+                    pageData.message
+                  );
+                }
+
+                // Update progress
+                const progress =
+                  ((page - startPage + 1) / totalPagesToFetch) * 100;
+                progressBar.style.width = `${progress}%`;
+                statusText.textContent = `Sayfa ${
+                  page - startPage + 1
+                }/${totalPagesToFetch} yüklendi (${
+                  state.loadedProducts.length
+                }/${state.totalProducts} ürün)`;
+              }
+            }
+          }
+
+          // All done
+          progressBar.classList.add("bg-success");
+          statusText.textContent = `Yükleme tamamlandı! ${state.loadedProducts.length} ürün gösteriliyor.`;
+
+          // Update page info
+          updatePageInfo(startPage, endPage);
+        } catch (error) {
+          console.error("Error fetching page range:", error);
+          statusText.textContent = `Hata: ${error.message}`;
+          progressBar.classList.add("bg-danger");
+        } finally {
+          state.isLoading = false;
+        }
+      }
+
+      function updatePageInfo(startPage, endPage) {
+        const container = document.getElementById("productContainer");
+        const infoDiv = container.querySelector(".page-info");
+
+        if (infoDiv) {
+          infoDiv.innerHTML = `
+            <div class="alert alert-success">
+              <strong>Sayfa ${startPage}-${endPage}</strong> - Toplam ${state.totalProducts} ürün içinden ${state.loadedProducts.length} ürün gösteriliyor
+            </div>
+          `;
+        }
+      }
+
+      function showLoading() {
+        document.getElementById("loadingIndicator").style.display = "flex";
+      }
+
+      function hideLoading() {
+        document.getElementById("loadingIndicator").style.display = "none";
+      }
+
+      // Extract unique badges from products
+      function extractBadges(products) {
+        const badges = new Set();
+        products.forEach((product) => {
+          if (product.badges && product.badges.length > 0) {
+            product.badges.forEach((badge) => {
+              if (typeof badge === "string") {
+                badges.add(badge);
+              } else if (badge.BadgeName) {
+                badges.add(badge.BadgeName);
+              }
+            });
+          }
+        });
+        return Array.from(badges).sort();
+      }
+
+      // Render badge filters
+      function renderBadgeFilters() {
+        const container = document.getElementById("badgeFilters");
+        if (!container) return;
+
+        if (state.allBadges.length === 0) {
+          document.getElementById("badgeFiltersContainer").style.display =
+            "none";
+          return;
+        }
+
+        container.innerHTML = "";
+        state.allBadges.forEach((badge) => {
+          const isSelected = state.selectedBadges.includes(badge);
+          const badgeElement = document.createElement("button");
+          badgeElement.className = `btn btn-sm m-1 ${
+            isSelected ? "btn-primary" : "btn-outline-primary"
+          }`;
+          badgeElement.textContent = badge;
+          badgeElement.onclick = () => toggleBadgeFilter(badge);
+          container.appendChild(badgeElement);
+        });
+
+        document.getElementById("badgeFiltersContainer").style.display =
+          "block";
+      }
+
+      // Toggle badge filter
+      function toggleBadgeFilter(badge) {
+        const index = state.selectedBadges.indexOf(badge);
+        if (index === -1) {
+          state.selectedBadges.push(badge);
+        } else {
+          state.selectedBadges.splice(index, 1);
+        }
+        renderBadgeFilters();
+        renderProducts(
+          {
+            error: false,
+            products: state.loadedProducts,
+          },
+          true
+        );
+      }
+
+      // Filter products by selected badges
+      function filterProducts(products) {
+        if (state.selectedBadges.length === 0) {
+          return products;
+        }
+        return products.filter((product) => {
+          if (!product.badges || product.badges.length === 0) {
+            return false;
+          }
+          return product.badges.some((badge) => {
+            const badgeName =
+              typeof badge === "string" ? badge : badge.BadgeName;
+            return state.selectedBadges.includes(badgeName);
+          });
+        });
+      }
+
+      // Render products, optionally clearing the container first
+      function renderProducts(data, clearContainer = false) {
+        const container = document.getElementById("productContainer");
+        const loadMoreContainer = document.getElementById("loadMoreContainer");
+
+        if (clearContainer) {
+          container.innerHTML = "";
+          state.displayedProducts = 0;
+        }
+
+        // Check if there's an error
+        if (data.error) {
+          container.innerHTML = `
+            <div class="col-12 text-center">
+              <div class="alert alert-warning">
+                <h4 class="alert-heading">Ürünler Yüklenemedi</h4>
+                <p>Ürün bilgileri alınırken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.</p>
+                <hr>
+                <p class="mb-0">Teknik detay: ${data.message}</p>
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-primary me-2" onclick="fetchSinglePage()">
+                  Tekrar Dene
+                </button>
+              </div>
+            </div>
+          `;
+          loadMoreContainer.style.display = "none";
+          return;
+        }
+
+        // Add page information if clearing container
+        if (clearContainer) {
+          container.innerHTML = `
+            <div class="col-12 mb-4 page-info">
+              <div class="alert alert-info">
+                Sayfa ${data.page} - Toplam ${data.totalCount} ürün
+              </div>
+            </div>
+          `;
+        }
+
+        // Check if products is defined and is an array
+        if (!data.products || !Array.isArray(data.products)) {
+          if (clearContainer) {
+            container.innerHTML += `
+              <div class="col-12 text-center">
+                <div class="alert alert-warning">
+                  <h4 class="alert-heading">Ürünler Yüklenemedi</h4>
+                  <p>Ürün bilgileri alınırken bir sorun oluştu. Lütfen daha sonra tekrar deneyin.</p>
+                </div>
+              </div>
+            `;
+          }
+          loadMoreContainer.style.display = "none";
+          return;
+        }
+
+        // If there are no products, show a message
+        if (data.products.length === 0) {
+          if (clearContainer) {
+            container.innerHTML += `
+              <div class="col-12 text-center">
+                <div class="alert alert-info">Bu kategoride ürün bulunamadı.</div>
+                <button class="btn btn-outline-primary mt-3" onclick="fetchSinglePage()">
+                  Tekrar Dene
+                </button>
+              </div>
+            `;
+          }
+          loadMoreContainer.style.display = "none";
+          return;
+        }
+
+        // Update all badges if we have new products
+        if (data.products && data.products.length > 0) {
+          const newBadges = extractBadges(data.products);
+          if (newBadges.length > 0) {
+            state.allBadges = Array.from(
+              new Set([...state.allBadges, ...newBadges])
+            ).sort();
+            renderBadgeFilters();
+          }
+        }
+
+        // Filter products by selected badges
+        const filteredProducts = filterProducts(data.products || []);
+
+        // Render each product
+        renderProductCards(filteredProducts);
+
+        // Update displayed products count
+        state.displayedProducts += data.products.length;
+
+        // Show/hide load more button based on if we have more products to display
+        if (state.loadedProducts.length > state.displayedProducts) {
+          loadMoreContainer.style.display = "block";
+        } else {
+          loadMoreContainer.style.display = "none";
+        }
+      }
+
+      // Render additional products without clearing container
+      function renderAdditionalProducts(products) {
+        if (!products || !Array.isArray(products) || products.length === 0)
+          return;
+        renderProductCards(products);
+        state.displayedProducts += products.length;
+      }
+
+      // Render product cards to the container
+      function renderProductCards(products) {
+        const container = document.getElementById("productContainer");
+
+        products.forEach((product) => {
+          // API alan adlarına göre değişkenleri tanımlayalım (açıklık için)
+          const S_Formatted = product.strikeThroughPrice; // StrikeThroughPriceToShowOnScreenFormatted
+          const A_Formatted = product.actualPriceFormatted; // ActualPriceToShowOnScreenFormatted
+          const C_Raw = product.campaignPrice;           // CampaignPrice (ham sayısal değer)
+          const C_Formatted = product.campaignPriceFormatted; // CampaignPriceFormatted (formatlanmış string)
+
+          let htmlOldPrice = "";
+          let htmlCurrentPrice = "";
+
+          // Formatlanmış fiyat string'inin geçerli ve sıfır/boş olmadığını kontrol eden yardımcı fonksiyon
+          const isValidFormattedPrice = (priceStr) => {
+            return priceStr && priceStr.trim() !== "" && priceStr !== "0" && priceStr !== "0 TL" && priceStr !== "0,00 TL";
+          };
+          
+          const sIsValid = isValidFormattedPrice(S_Formatted);
+          const aIsValid = isValidFormattedPrice(A_Formatted);
+          const cRawIsNonZero = C_Raw !== null && C_Raw !== undefined && parseFloat(C_Raw) !== 0;
+          const cFormattedIsValid = isValidFormattedPrice(C_Formatted);
+
+          // 1. KOŞUL: S_Formatted ve A_Formatted geçerli, sıfır değil ve EŞİT
+          if (sIsValid && aIsValid && S_Formatted === A_Formatted) {
+            if (cRawIsNonZero && cFormattedIsValid) {
+              // Kampanya aktif: A_Formatted eski fiyat, C_Formatted yeni fiyat
+              htmlOldPrice = `<span class="text-muted text-decoration-line-through me-2">${A_Formatted}</span>`;
+              htmlCurrentPrice = `<span class="fw-bold text-danger">${C_Formatted}</span>`;
+            } else {
+              // Kampanya yok: A_Formatted güncel fiyat olarak gösterilir
+              htmlCurrentPrice = `<span class="fw-bold">${A_Formatted}</span>`;
+            }
+          } 
+          // 2. YENİ KOŞUL: S_Formatted ve A_Formatted geçerli, sıfır değil VE BİRBİRİNDEN FARKLI
+          else if (sIsValid && aIsValid && S_Formatted !== A_Formatted) {
+            // S_Formatted eski fiyat, A_Formatted indirimli/yeni fiyat (kırmızı, kalın)
+            htmlOldPrice = `<span class="text-muted text-decoration-line-through me-2">${S_Formatted}</span>`;
+            htmlCurrentPrice = `<span class="fw-bold text-danger">${A_Formatted}</span>`;
+          } 
+          // 3. DİĞER TÜM DURUMLAR (Yukarıdaki iki özel koşul da tutmadı)
+          //    Bu genellikle S_Formatted veya A_Formatted'dan birinin veya her ikisinin geçersiz/sıfır olduğu durumları kapsar.
+          //    Bu durumda öncelik CampaignPrice'dadır (varsa), yoksa kalan geçerli fiyat gösterilir.
+          else {
+            if (cRawIsNonZero && cFormattedIsValid) {
+              // Kampanya aktif: C_Formatted yeni fiyat.
+              htmlCurrentPrice = `<span class="fw-bold text-danger">${C_Formatted}</span>`;
+
+              // Eski fiyatı belirle (A_Formatted veya S_Formatted olabilir, C_Formatted'dan farklı ve geçerli olmalı)
+              if (aIsValid && A_Formatted !== C_Formatted) {
+                htmlOldPrice = `<span class="text-muted text-decoration-line-through me-2">${A_Formatted}</span>`;
+              } else if (sIsValid && S_Formatted !== C_Formatted) { // A_Formatted uygun değilse S_Formatted'a bak
+                htmlOldPrice = `<span class="text-muted text-decoration-line-through me-2">${S_Formatted}</span>`;
+              }
+            } else {
+              // Kampanya yok. Ve ilk iki koşul da tutmadı.
+              // A_Formatted geçerliyse onu göster.
+              if (aIsValid) {
+                htmlCurrentPrice = `<span class="fw-bold">${A_Formatted}</span>`;
+              } 
+              // A_Formatted geçerli değilse ama S_Formatted geçerliyse, S_Formatted'ı göster (nadir durum).
+              else if (sIsValid) { 
+                htmlCurrentPrice = `<span class="fw-bold">${S_Formatted}</span>`;
+              }
+              // Hiçbir geçerli fiyat bilgisi yoksa.
+              else {
+                htmlCurrentPrice = '<span class="text-muted small">Fiyat bilgisi yok</span>';
+              }
+            }
+          }
+
+          const card = `
+            <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4">
+                <div class="card product-card">
+                    <img src="${
+                      product.image || ""
+                    }" class="card-img-top product-image" alt="${
+            product.displayName
+          }">
+                    <div class="card-body">
+                        <h6 class="card-title text-primary">${
+                          product.brandName || "Bilinmeyen Marka"
+                        }</h6>
+                        <p class="card-text">${
+                          product.displayName || "Bilinmeyen Ürün"
+                        }</p>
+                        <div class="mb-2 price-details">
+                            ${htmlOldPrice}${htmlOldPrice && htmlCurrentPrice ? ' ' : ''}${htmlCurrentPrice}
+                        </div>
+                        <div class="barcode mt-2">Barkod: ${
+                          product.barcode || "Belirtilmemiş"
+                        }</div>
+                        
+                        ${
+                          product.badges && product.badges.length > 0
+                            ? `
+                          <div class="mt-3">
+                            <small class="text-muted">Rozetler:</small>
+                            <div class="mt-1">
+                              ${product.badges
+                                .map(
+                                  (badge) =>
+                                    `<span class="badge-item">${
+                                      badge.BadgeName || badge
+                                    }</span>`
+                                )
+                                .join("")}
+                            </div>
+                          </div>
+                        `
+                            : ""
+                        }
+                    </div>
+                </div>
+            </div>
+          `;
+          container.innerHTML += card;
+        });
+      }
+
+      // Load more products from already loaded data
+      function loadMoreProducts() {
+        const remainingProducts = state.loadedProducts.slice(
+          state.displayedProducts
+        );
+        const productsToShow = remainingProducts.slice(0, state.pageSize); // Show one page worth of products
+
+        if (productsToShow.length > 0) {
+          renderAdditionalProducts(productsToShow);
+
+          // Hide load more button if no more products
+          if (state.displayedProducts >= state.loadedProducts.length) {
+            document.getElementById("loadMoreContainer").style.display = "none";
+          }
+        }
+      }
+
+      // Sayfa yüklendiğinde
+      window.addEventListener("load", () => {
+        // Hide loading initially
+        hideLoading();
+
+        // Set up event listeners
+        document
+          .getElementById("fetchButton")
+          .addEventListener("click", fetchSinglePage);
+        document
+          .getElementById("fetchRangeButton")
+          .addEventListener("click", fetchPageRange);
+        document
+          .getElementById("loadMoreButton")
+          .addEventListener("click", loadMoreProducts);
+
+        // Allow pressing Enter in the input field
+        document
+          .getElementById("pageInput")
+          .addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              fetchSinglePage();
+            }
+          });
+      });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

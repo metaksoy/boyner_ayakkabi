@@ -1,0 +1,64 @@
+[2025-05-06 20:34:08] API request received
+[2025-05-06 20:34:08] Action: list, Page: 1
+[2025-05-06 20:34:08] Requesting URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:34:08] HTTP Code: 403, Effective URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:34:08] HTTP Error: 403
+[2025-05-06 20:34:08] Trying fallback request...
+[2025-05-06 20:34:08] Fallback URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&CategoryID=574
+[2025-05-06 20:34:08] Fallback HTTP Code: 403
+[2025-05-06 20:34:08] Fallback request failed: 
+[2025-05-06 20:34:08] Result: ERROR, Message: Both primary and fallback requests failed. Please try again later.
+[2025-05-06 20:34:09] API request received
+[2025-05-06 20:34:09] Action: list, Page: 1
+[2025-05-06 20:34:09] Requesting URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:34:10] HTTP Code: 403, Effective URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:34:10] HTTP Error: 403
+[2025-05-06 20:34:10] Trying fallback request...
+[2025-05-06 20:34:10] Fallback URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&CategoryID=574
+[2025-05-06 20:34:11] Fallback HTTP Code: 403
+[2025-05-06 20:34:11] Fallback request failed: 
+[2025-05-06 20:34:11] Result: ERROR, Message: Both primary and fallback requests failed. Please try again later.
+[2025-05-06 20:36:17] API request received
+[2025-05-06 20:36:17] Action: list, Page: 1, Alternative: false
+[2025-05-06 20:36:17] Requesting URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:36:18] HTTP Code: 403, Effective URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:36:18] HTTP Error: 403
+[2025-05-06 20:36:18] Trying fallback request...
+[2025-05-06 20:36:18] Fallback URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&CategoryID=574
+[2025-05-06 20:36:18] Fallback HTTP Code: 403
+[2025-05-06 20:36:18] Fallback request failed: 
+[2025-05-06 20:36:18] Result: ERROR, Message: Both primary and fallback requests failed. Please try again later.
+[2025-05-06 20:36:18] Sending error response: Both primary and fallback requests failed. Please try again later.
+[2025-05-06 20:36:20] API request received
+[2025-05-06 20:36:20] Action: list, Page: 1, Alternative: true
+[2025-05-06 20:36:20] Requesting URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:36:20] HTTP Code: 403, Effective URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:36:20] HTTP Error: 403
+[2025-05-06 20:36:20] Trying fallback request...
+[2025-05-06 20:36:20] Fallback URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&CategoryID=574
+[2025-05-06 20:36:20] Fallback HTTP Code: 403
+[2025-05-06 20:36:20] Fallback request failed: 
+[2025-05-06 20:36:20] Result: ERROR, Message: Both primary and fallback requests failed. Please try again later.
+[2025-05-06 20:36:20] Sending error response: Both primary and fallback requests failed. Please try again later.
+[2025-05-06 20:36:22] API request received
+[2025-05-06 20:36:22] Action: list, Page: 1, Alternative: true
+[2025-05-06 20:36:22] Requesting URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:36:22] HTTP Code: 403, Effective URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:36:22] HTTP Error: 403
+[2025-05-06 20:36:22] Trying fallback request...
+[2025-05-06 20:36:22] Fallback URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&CategoryID=574
+[2025-05-06 20:36:22] Fallback HTTP Code: 403
+[2025-05-06 20:36:22] Fallback request failed: 
+[2025-05-06 20:36:22] Result: ERROR, Message: Both primary and fallback requests failed. Please try again later.
+[2025-05-06 20:36:22] Sending error response: Both primary and fallback requests failed. Please try again later.
+[2025-05-06 20:36:26] API request received
+[2025-05-06 20:36:26] Action: list, Page: 1, Alternative: false
+[2025-05-06 20:36:26] Requesting URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:36:26] HTTP Code: 403, Effective URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&LastSelectedAttributeId=2&FilterIDList=8770&CategoryID=574
+[2025-05-06 20:36:26] HTTP Error: 403
+[2025-05-06 20:36:26] Trying fallback request...
+[2025-05-06 20:36:26] Fallback URL: https://mpcore-listingsearch-prod.boyner.com.tr/product/search?Page=1&DropListingPageSize=24&CategoryID=574
+[2025-05-06 20:36:26] Fallback HTTP Code: 403
+[2025-05-06 20:36:26] Fallback request failed: 
+[2025-05-06 20:36:26] Result: ERROR, Message: Both primary and fallback requests failed. Please try again later.
+[2025-05-06 20:36:26] Sending error response: Both primary and fallback requests failed. Please try again later.

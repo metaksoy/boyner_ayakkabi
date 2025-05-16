@@ -1,0 +1,19 @@
+{
+  "name": "boyner-spor-ayakkabi",
+  "version": "1.0.0",
+  "description": "Boyner spor ayakkabı listeleme projesi",
+  "main": "index.html",
+  "scripts": {
+    "start": "echo "Open index.html in your browser""
+  },
+  "keywords": [
+    "boyner",
+    "spor",
+    "ayakkabı"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+} 
