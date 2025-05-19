@@ -10,27 +10,6 @@ Bu proje, Boyner'in spor ayakkabı kategorisindeki ürünleri listelemek için g
 - Duyarlı tasarım (responsive design)
 - Ürün bilgilerinin detaylı gösterimi (marka, isim, fiyat, indirim, vb.)
 
-## Netlify ile Canlıya Alma
-
-Bu proje Netlify'da sunulmak üzere yapılandırılmıştır. Netlify Functions kullanılarak API çağrıları sunucu tarafında gerçekleştirilir.
-
-### Netlify Dağıtım Adımları
-
-1. GitHub'dan projeyi Netlify'a bağlayın
-2. Herhangi bir build ayarı yapmanıza gerek yok, netlify.toml dosyası gerekli yapılandırmayı içermektedir
-3. Dağıtım tamamlandıktan sonra site otomatik olarak yayınlanacaktır
-
-## Geliştirme
-
-Yerel ortamda geliştirme yapmak için:
-
-1. Projeyi klonlayın
-2. `npm install` komutunu çalıştırarak bağımlılıkları yükleyin
-3. Yerel geliştirme için [Netlify CLI](https://docs.netlify.com/cli/get-started/) kullanabilirsiniz:
-   ```
-   npm install netlify-cli -g
-   netlify dev
-   ```
 
 ## Teknolojiler
 
